@@ -1,6 +1,7 @@
 package br.com.vr.autorizador.service;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,8 @@ public class CartaoService {
 		return cartaoRequest;
 	}
 
-	public BigDecimal obterSaldo(String numeroCartao) {
-		return cartaoRepository.findSaldoByNumeroCartao(numeroCartao);
+	public BigDecimal obterSaldo(String numeroCartao) throws Exception {
+		Optional<Cartao> cartao = cartaoRepository.findById(numeroCartao);
+		return cartao.orElseThrow(() -> new Exception("Cartão não existe")).getSaldo();
 	}
 }

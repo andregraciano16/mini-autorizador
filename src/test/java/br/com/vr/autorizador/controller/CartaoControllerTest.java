@@ -91,5 +91,21 @@ public class CartaoControllerTest {
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 		assertThat(response.getContentAsString()).isEqualTo(jsonSaldo.write(saldoCartao).getJson());
 	}
+	
+	
+	@Test
+	public void deveRetornaErro404AoConsultarSaldo() throws Exception {
+		String numeroCartao = "12345678912345672";
+		
+		given(cartaoService.obterSaldo(numeroCartao)).willThrow(new Exception());
+	
+		MockHttpServletResponse response = mvc.perform(get("/cartoes/" + numeroCartao)
+				.accept(MediaType.APPLICATION_JSON))
+			.andReturn()
+			.getResponse();
+	
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+		assertThat(response.getContentAsString()).isEqualTo("");
+	}
 
 }
