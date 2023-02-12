@@ -28,8 +28,17 @@ public class CartaoService {
 		return cartaoRequest;
 	}
 
-	public BigDecimal obterSaldo(String numeroCartao) throws Exception {
+	public Cartao findByNumeroCartao(String numeroCartao) throws Exception {
 		Optional<Cartao> cartao = cartaoRepository.findById(numeroCartao);
-		return cartao.orElseThrow(() -> new Exception("Cartão não existe")).getSaldo();
+		return cartao.orElseThrow(() -> new Exception("Cartão não existe"));
+	}
+
+	public BigDecimal obterSaldo(String numeroCartao) throws Exception {
+		return findByNumeroCartao(numeroCartao).getSaldo();
+	}
+
+	public void atualizarSaldo(Cartao cartao, BigDecimal valorTransacao) {
+		cartao.setSaldo(cartao.getSaldo().subtract(valorTransacao));
+		cartaoRepository.saveAndFlush(cartao);
 	}
 }
