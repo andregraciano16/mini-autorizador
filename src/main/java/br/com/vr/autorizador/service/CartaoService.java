@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.vr.autorizador.entity.Cartao;
+import br.com.vr.autorizador.exception.CartaoJaExisteException;
+import br.com.vr.autorizador.exception.CartaoNaoEncontradoException;
 import br.com.vr.autorizador.repository.CartaoRepository;
 import br.com.vr.autorizador.request.CartaoRequest;
 
@@ -22,18 +24,18 @@ public class CartaoService {
 		Cartao cartao = Cartao.builder().numeroCartao(cartaoRequest.getNumeroCartao()).senha(cartaoRequest.getSenha())
 				.saldo(SALDO_INICIAL).build();
 		cartaoRepository.findById(cartaoRequest.getNumeroCartao()).ifPresent(cartaoBanco -> {
-			throw new IllegalArgumentException("Já existe esse cartão");
+			throw new CartaoJaExisteException(cartaoRequest.getNumeroCartao(), cartaoRequest.getSenha());
 		});
 		cartaoRepository.saveAndFlush(cartao);
 		return cartaoRequest;
 	}
 
-	public Cartao findByNumeroCartao(String numeroCartao) throws Exception {
+	public Cartao findByNumeroCartao(String numeroCartao) {
 		Optional<Cartao> cartao = cartaoRepository.findById(numeroCartao);
-		return cartao.orElseThrow(() -> new Exception("Cartão não existe"));
+		return cartao.orElseThrow(() -> new CartaoNaoEncontradoException());
 	}
 
-	public BigDecimal obterSaldo(String numeroCartao) throws Exception {
+	public BigDecimal obterSaldo(String numeroCartao) {
 		return findByNumeroCartao(numeroCartao).getSaldo();
 	}
 

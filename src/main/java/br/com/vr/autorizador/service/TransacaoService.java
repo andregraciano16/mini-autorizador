@@ -17,7 +17,7 @@ public class TransacaoService {
 	@Autowired
 	private CartaoService cartaoService;
 	
-	public TransacaoRequest realizarTransacao (TransacaoRequest transacaoRequest) throws Exception {
+	public TransacaoRequest realizarTransacao (TransacaoRequest transacaoRequest) {
 		Cartao cartao = cartaoService.findByNumeroCartao(transacaoRequest.getNumeroCartao());
 		Transacao transacao = Transacao.builder().valor(transacaoRequest.getValor()).cartao(cartao).build();
 		transacaoRepository.save(transacao);

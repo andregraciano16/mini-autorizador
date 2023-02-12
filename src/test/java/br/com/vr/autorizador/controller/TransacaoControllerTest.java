@@ -46,6 +46,8 @@ public class TransacaoControllerTest {
 			.getResponse();
 		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+		assertThat(response.getContentAsString()).isEqualTo("OK");
+
 	}
 
 }

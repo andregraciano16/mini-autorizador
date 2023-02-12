@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import br.com.vr.autorizador.exception.CartaoJaExisteException;
+import br.com.vr.autorizador.exception.CartaoNaoEncontradoException;
 import br.com.vr.autorizador.repository.CartaoRepository;
 import br.com.vr.autorizador.request.CartaoRequest;
 import br.com.vr.autorizador.service.CartaoService;
@@ -62,7 +64,7 @@ public class CartaoControllerTest {
 	public void deveVerificarQueOCartaoJaExiste() throws Exception {
 		CartaoRequest cartao = CartaoRequest.builder().numeroCartao("12345678912345672").senha("123456").build();
 		
-		given(cartaoService.cadastrar(cartao)).willThrow(new RuntimeException());
+		given(cartaoService.cadastrar(cartao)).willThrow(new CartaoJaExisteException(cartao.getNumeroCartao(), cartao.getSenha()));
 
 		MockHttpServletResponse responseError = mvc.perform(post("/cartoes")
 				.accept(MediaType.APPLICATION_JSON)
@@ -97,7 +99,7 @@ public class CartaoControllerTest {
 	public void deveRetornaErro404AoConsultarSaldo() throws Exception {
 		String numeroCartao = "12345678912345672";
 		
-		given(cartaoService.obterSaldo(numeroCartao)).willThrow(new Exception());
+		given(cartaoService.obterSaldo(numeroCartao)).willThrow(new CartaoNaoEncontradoException());
 	
 		MockHttpServletResponse response = mvc.perform(get("/cartoes/" + numeroCartao)
 				.accept(MediaType.APPLICATION_JSON))

@@ -17,16 +17,11 @@ public class TransacaoController {
 
 	@Autowired
 	private TransacaoService transacaoService;
-	
+
 	@PostMapping
 	public ResponseEntity<?> realizarTransacao(@RequestBody TransacaoRequest transacaoRequest) {
-		try {
-			transacaoService.realizarTransacao(transacaoRequest);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+		transacaoService.realizarTransacao(transacaoRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body("OK");
 	}
-	
+
 }

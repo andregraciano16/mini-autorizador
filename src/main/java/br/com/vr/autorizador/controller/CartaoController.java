@@ -24,23 +24,14 @@ public class CartaoController {
 
 	@PostMapping
 	public ResponseEntity<CartaoRequest> cadastrar(@RequestBody CartaoRequest cartaoRequest) {
-		try {
-			cartaoService.cadastrar(cartaoRequest);
-			return ResponseEntity.status(HttpStatus.CREATED).body(cartaoRequest);
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(cartaoRequest);
-		}
+		cartaoService.cadastrar(cartaoRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(cartaoRequest);
 	}
 
 	@GetMapping("/{numeroCartao}")
 	public ResponseEntity<BigDecimal> obterSaldo(@PathVariable String numeroCartao) {
-		try {
-			BigDecimal obterSaldo = cartaoService.obterSaldo(numeroCartao);
-			return ResponseEntity.ok(obterSaldo);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		BigDecimal obterSaldo = cartaoService.obterSaldo(numeroCartao);
+		return ResponseEntity.ok(obterSaldo);
 	}
 
 }
