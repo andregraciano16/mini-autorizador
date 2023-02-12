@@ -6,24 +6,24 @@ import br.com.vr.autorizador.enums.MensagemErroEnum;
 import lombok.Getter;
 
 @Getter
-public class SaldoInsuficienteException extends RuntimeException {
+public class CartaoInexistenteException extends RuntimeException {
 
-	private static final long serialVersionUID = -8717001500104914717L;
-
+	private static final long serialVersionUID = -1131512295358861747L;
+	
 	private HttpStatus httpStatus;
 	private MensagemErroEnum mensagemErroEnum;
-	
-	public SaldoInsuficienteException() {
+
+	public CartaoInexistenteException() {
 		super();
 		httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
-		mensagemErroEnum = MensagemErroEnum.SALDO_INSUFICIENTE;
+		mensagemErroEnum = MensagemErroEnum.CARTAO_INEXISTENTE;
 	}
 	
-	public SaldoInsuficienteException(String msg) {
+	public CartaoInexistenteException(String msg) {
 		super(msg);
 	}
 
-	public SaldoInsuficienteException(String msg, Throwable cause) {
+	public CartaoInexistenteException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 }
