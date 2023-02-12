@@ -1,0 +1,51 @@
+package br.com.vr.autorizador.controller;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+
+import br.com.vr.autorizador.request.TransacaoRequest;
+import br.com.vr.autorizador.service.TransacaoService;
+
+@AutoConfigureJsonTesters
+@WebMvcTest(TransacaoController.class)
+public class TransacaoControllerTest {
+
+	@Autowired
+	private MockMvc mvc;
+	
+	@Autowired
+	private JacksonTester<TransacaoRequest> jsonTransacaoRest;
+
+	@MockBean
+	private TransacaoService transacaoService;
+
+	@Test
+	public void deveRealizarUmaTransacaoComSucesso() throws IOException, Exception {
+		TransacaoRequest transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
+				.senhaCartao("123456").valor(new BigDecimal(10)).build();
+		
+		MockHttpServletResponse response = mvc.perform(post("/transacoes")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(jsonTransacaoRest.write(transacaoRequest).getJson()))
+			.andReturn()
+			.getResponse();
+		
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+	}
+
+}
