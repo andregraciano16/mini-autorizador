@@ -32,20 +32,20 @@ public class CustomExceptionHandler {
 	public ResponseEntity<Object> handleUserNotFoundException(CartaoInexistenteException exception,
 			WebRequest request) {
 
-		return new ResponseEntity<>(exception.getMensagemErroEnum(), exception.getHttpStatus());
+		return new ResponseEntity<>(exception.getMensagemErroEnum().getMensagem(), exception.getHttpStatus());
 	}
 
 	@ExceptionHandler(SaldoInsuficienteException.class)
 	public ResponseEntity<Object> handleSaldoInsuficienteException(SaldoInsuficienteException exception,
 			WebRequest request) {
 
-		return new ResponseEntity<>(exception.getMensagemErroEnum(), exception.getHttpStatus());
+		return new ResponseEntity<>(exception.getMensagemErroEnum().getMensagem(), exception.getHttpStatus());
 	}
 
 	@ExceptionHandler(SenhaInvalidaException.class)
 	public ResponseEntity<Object> handleSenhaInvalidaException(SenhaInvalidaException exception,
 			WebRequest request) {
-		return new ResponseEntity<>(exception.getMensagemErroEnum(), exception.getHttpStatus());
+		return new ResponseEntity<>(exception.getMensagemErroEnum().getMensagem(), exception.getHttpStatus());
 	}
 
 }

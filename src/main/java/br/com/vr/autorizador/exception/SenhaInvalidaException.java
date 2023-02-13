@@ -13,10 +13,13 @@ public class SenhaInvalidaException extends RuntimeException {
 	private HttpStatus httpStatus;
 	private MensagemErroEnum mensagemErroEnum;
 	
-	public SenhaInvalidaException(String msg) {
-		super(msg);
+	public SenhaInvalidaException() {
 		httpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
 		mensagemErroEnum = MensagemErroEnum.SENHA_INVALIDA;
+	}
+	
+	public SenhaInvalidaException(String msg) {
+		super(msg);
 	}
 
 	public SenhaInvalidaException(String msg, Throwable cause) {
