@@ -1,6 +1,7 @@
 package br.com.vr.autorizador.service;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,14 @@ public class CartaoService {
 	private CartaoRepository cartaoRepository;
 
 	public CartaoRequest cadastrar(CartaoRequest cartaoRequest) throws RuntimeException {
-		Cartao cartao = Cartao.builder().numeroCartao(cartaoRequest.getNumeroCartao()).senha(cartaoRequest.getSenha())
-				.saldo(SALDO_INICIAL).build();
-		cartaoRepository.findById(cartaoRequest.getNumeroCartao()).ifPresent(cartaoBanco -> {
+		try {
+			cartaoRepository.findById(cartaoRequest.getNumeroCartao()).orElseThrow();
 			throw new CartaoJaExisteException(cartaoRequest.getNumeroCartao(), cartaoRequest.getSenha());
-		});
-		cartaoRepository.saveAndFlush(cartao);
+		} catch (NoSuchElementException e) {
+			Cartao cartao = Cartao.builder().numeroCartao(cartaoRequest.getNumeroCartao())
+					.senha(cartaoRequest.getSenha()).saldo(SALDO_INICIAL).build();
+			cartaoRepository.saveAndFlush(cartao);
+		}
 		return cartaoRequest;
 	}
 
