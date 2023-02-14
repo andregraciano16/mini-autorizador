@@ -21,16 +21,15 @@ public class CartaoService {
 	@Autowired
 	private CartaoRepository cartaoRepository;
 
-	public CartaoRequest cadastrar(CartaoRequest cartaoRequest) throws RuntimeException {
+	public Cartao cadastrar(CartaoRequest cartaoRequest) throws RuntimeException {
 		try {
 			cartaoRepository.findById(cartaoRequest.getNumeroCartao()).orElseThrow();
 			throw new CartaoJaExisteException(cartaoRequest.getNumeroCartao(), cartaoRequest.getSenha());
 		} catch (NoSuchElementException e) {
 			Cartao cartao = Cartao.builder().numeroCartao(cartaoRequest.getNumeroCartao())
 					.senha(cartaoRequest.getSenha()).saldo(SALDO_INICIAL).build();
-			cartaoRepository.saveAndFlush(cartao);
+			return cartaoRepository.saveAndFlush(cartao);
 		}
-		return cartaoRequest;
 	}
 
 	public Cartao findByNumeroCartao(String numeroCartao) {
@@ -42,8 +41,8 @@ public class CartaoService {
 		return findByNumeroCartao(numeroCartao).getSaldo();
 	}
 
-	public void atualizarSaldo(Cartao cartao, BigDecimal valorTransacao) {
+	public Cartao atualizarSaldo(Cartao cartao, BigDecimal valorTransacao) {
 		cartao.setSaldo(cartao.getSaldo().subtract(valorTransacao));
-		cartaoRepository.saveAndFlush(cartao);
+		return cartaoRepository.saveAndFlush(cartao);
 	}
 }

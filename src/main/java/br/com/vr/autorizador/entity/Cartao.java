@@ -6,6 +6,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -29,6 +31,7 @@ public class Cartao {
 	@Column(name = "senha", length = 6, nullable = false)
 	private String senha;
 
+	@JsonIgnore
 	@Column(name = "saldo", nullable = false)
 	private BigDecimal saldo;
 
