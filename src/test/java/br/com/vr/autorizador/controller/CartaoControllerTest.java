@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import br.com.vr.autorizador.entity.Cartao;
 import br.com.vr.autorizador.exception.CartaoJaExisteException;
 import br.com.vr.autorizador.exception.CartaoNaoEncontradoException;
 import br.com.vr.autorizador.repository.CartaoRepository;
@@ -35,6 +36,9 @@ public class CartaoControllerTest {
 	private JacksonTester<CartaoRequest> jsonCartaoRequest;
 
 	@Autowired
+	private JacksonTester<Cartao> jsonCartao;
+
+	@Autowired
 	private JacksonTester<BigDecimal> jsonSaldo;
 	
 	@MockBean
@@ -45,19 +49,20 @@ public class CartaoControllerTest {
 	
 	@Test
 	public void deveCadastrarUmCartao() throws Exception {
-		CartaoRequest cartao = CartaoRequest.builder().numeroCartao("12345678912345672").senha("123456").build();
+		CartaoRequest cartaoRequest = CartaoRequest.builder().numeroCartao("12345678912345672").senha("123456").build();
+		Cartao cartao = Cartao.builder().numeroCartao("12345678912345672").senha("123456").build();
 		
-		given(cartaoService.cadastrar(cartao)).willReturn(cartao);
+		given(cartaoService.cadastrar(cartaoRequest)).willReturn(cartao);
 	
 		MockHttpServletResponse response = mvc.perform(post("/cartoes")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(jsonCartaoRequest.write(cartao).getJson()))
+				.content(jsonCartaoRequest.write(cartaoRequest).getJson()))
 			.andReturn()
 			.getResponse();
 		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-		assertThat(response.getContentAsString()).isEqualTo(jsonCartaoRequest.write(cartao).getJson());
+		assertThat(response.getContentAsString()).isEqualTo(jsonCartao.write(cartao).getJson());
 	}
 	
 	@Test
