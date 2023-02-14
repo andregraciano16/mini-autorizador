@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import java.io.IOException;
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -38,78 +39,63 @@ public class TransacaoControllerTest {
 	@MockBean
 	private TransacaoService transacaoService;
 
+	private static TransacaoRequest transacaoRequest;
+	
+	@BeforeAll
+	public static void carregarDados() {
+		transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
+				.senhaCartao("123456").valor(new BigDecimal(10)).build();
+	}
+	
 	@Test
 	public void deveRealizarUmaTransacaoComSucesso() throws IOException, Exception {
-		TransacaoRequest transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
-				.senhaCartao("123456").valor(new BigDecimal(10)).build();
-		
 		MockHttpServletResponse response = mvc.perform(post("/transacoes")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonTransacaoRest.write(transacaoRequest).getJson()))
 			.andReturn()
 			.getResponse();
-		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(response.getContentAsString()).isEqualTo("OK");
-
 	}
 	
 	@Test
 	public void deveValidarQueOSaldoEInsuficiente() throws IOException, Exception {
-		TransacaoRequest transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
-				.senhaCartao("123456").valor(new BigDecimal(10)).build();
-		
 		given(transacaoService.realizarTransacao(transacaoRequest)).willThrow(new SaldoInsuficienteException());
-		
 		MockHttpServletResponse response = mvc.perform(post("/transacoes")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonTransacaoRest.write(transacaoRequest).getJson()))
 			.andReturn()
 			.getResponse();
-		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
 		assertThat(response.getContentAsString()).isEqualTo(MensagemErroEnum.SALDO_INSUFICIENTE.getMensagem());
-
 	}
 	
 	@Test
 	public void deveValidarSenhaInvalida() throws IOException, Exception {
-		TransacaoRequest transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
-				.senhaCartao("123456").valor(new BigDecimal(10)).build();
-		
 		given(transacaoService.realizarTransacao(transacaoRequest)).willThrow(new SenhaInvalidaException());
-	
 		MockHttpServletResponse response = mvc.perform(post("/transacoes")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonTransacaoRest.write(transacaoRequest).getJson()))
 			.andReturn()
 			.getResponse();
-		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
 		assertThat(response.getContentAsString()).isEqualTo(MensagemErroEnum.SENHA_INVALIDA.getMensagem());
-
 	}
 	
 	@Test
 	public void deveValidarQueOCartaoEInexistente() throws IOException, Exception {
-		TransacaoRequest transacaoRequest = TransacaoRequest.builder().numeroCartao("12345678912345672")
-				.senhaCartao("123456").valor(new BigDecimal(10)).build();
-		
 		given(transacaoService.realizarTransacao(transacaoRequest)).willThrow(new CartaoInexistenteException());
-	
 		MockHttpServletResponse response = mvc.perform(post("/transacoes")
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jsonTransacaoRest.write(transacaoRequest).getJson()))
 			.andReturn()
 			.getResponse();
-		
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
 		assertThat(response.getContentAsString()).isEqualTo(MensagemErroEnum.CARTAO_INEXISTENTE.getMensagem());
-
 	}
 
 }

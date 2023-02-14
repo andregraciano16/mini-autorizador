@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.math.BigDecimal;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
@@ -29,9 +30,11 @@ import br.com.vr.autorizador.service.CartaoService;
 @WebMvcTest(CartaoController.class)
 public class CartaoControllerTest {
 
+	private static final String NUMERO_CARTAO = "12345678912345672";
+
 	@Autowired
 	private MockMvc mvc;
-	
+
 	@Autowired
 	private JacksonTester<CartaoRequest> jsonCartaoRequest;
 
@@ -40,77 +43,58 @@ public class CartaoControllerTest {
 
 	@Autowired
 	private JacksonTester<BigDecimal> jsonSaldo;
-	
+
 	@MockBean
 	private CartaoRepository cartaoRepository;
-	
+
 	@MockBean
 	private CartaoService cartaoService;
-	
+
+	private static Cartao cartao;
+	private static CartaoRequest cartaoRequest;
+
+	@BeforeAll
+	public static void carregarDados() {
+		cartaoRequest = CartaoRequest.builder().numeroCartao(NUMERO_CARTAO).senha("123456").build();
+		cartao = Cartao.builder().numeroCartao(NUMERO_CARTAO).senha("123456").build();
+	}
+
 	@Test
 	public void deveCadastrarUmCartao() throws Exception {
-		CartaoRequest cartaoRequest = CartaoRequest.builder().numeroCartao("12345678912345672").senha("123456").build();
-		Cartao cartao = Cartao.builder().numeroCartao("12345678912345672").senha("123456").build();
-		
 		given(cartaoService.cadastrar(cartaoRequest)).willReturn(cartao);
-	
-		MockHttpServletResponse response = mvc.perform(post("/cartoes")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(jsonCartaoRequest.write(cartaoRequest).getJson()))
-			.andReturn()
-			.getResponse();
-		
+		MockHttpServletResponse response = mvc.perform(post("/cartoes").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(jsonCartaoRequest.write(cartaoRequest).getJson()))
+				.andReturn().getResponse();
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
 		assertThat(response.getContentAsString()).isEqualTo(jsonCartao.write(cartao).getJson());
 	}
-	
+
 	@Test
 	public void deveVerificarQueOCartaoJaExiste() throws Exception {
-		CartaoRequest cartao = CartaoRequest.builder().numeroCartao("12345678912345672").senha("123456").build();
-		
-		given(cartaoService.cadastrar(cartao)).willThrow(new CartaoJaExisteException(cartao.getNumeroCartao(), cartao.getSenha()));
-
-		MockHttpServletResponse responseError = mvc.perform(post("/cartoes")
-				.accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(jsonCartaoRequest.write(cartao).getJson()))
-			.andReturn()
-			.getResponse();
-     
+		given(cartaoService.cadastrar(cartaoRequest))
+				.willThrow(new CartaoJaExisteException(cartao.getNumeroCartao(), cartao.getSenha()));
+		MockHttpServletResponse responseError = mvc.perform(post("/cartoes").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(jsonCartaoRequest.write(cartaoRequest).getJson()))
+				.andReturn().getResponse();
 		assertThat(responseError.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY.value());
-		assertThat(responseError.getContentAsString()).isEqualTo(jsonCartaoRequest.write(cartao).getJson());
-
+		assertThat(responseError.getContentAsString()).isEqualTo(jsonCartaoRequest.write(cartaoRequest).getJson());
 	}
-	
+
 	@Test
-	public void deveObterOSaldoCartaoCadastrado () throws Exception {
+	public void deveObterOSaldoCartaoCadastrado() throws Exception {
 		BigDecimal saldoCartao = new BigDecimal(500);
-		String numeroCartao = "12345678912345672";
-		
-		given(cartaoService.obterSaldo(numeroCartao)).willReturn(saldoCartao);
-	
-		MockHttpServletResponse response = mvc.perform(get("/cartoes/" + numeroCartao)
-				.accept(MediaType.APPLICATION_JSON))
-			.andReturn()
-			.getResponse();
-	
+		given(cartaoService.obterSaldo(NUMERO_CARTAO)).willReturn(saldoCartao);
+		MockHttpServletResponse response = mvc
+				.perform(get("/cartoes/" + NUMERO_CARTAO).accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 		assertThat(response.getContentAsString()).isEqualTo(jsonSaldo.write(saldoCartao).getJson());
 	}
-	
-	
+
 	@Test
 	public void deveRetornaErro404AoConsultarSaldo() throws Exception {
-		String numeroCartao = "12345678912345672";
-		
-		given(cartaoService.obterSaldo(numeroCartao)).willThrow(new CartaoNaoEncontradoException());
-	
-		MockHttpServletResponse response = mvc.perform(get("/cartoes/" + numeroCartao)
-				.accept(MediaType.APPLICATION_JSON))
-			.andReturn()
-			.getResponse();
-	
+		given(cartaoService.obterSaldo(NUMERO_CARTAO)).willThrow(new CartaoNaoEncontradoException());
+		MockHttpServletResponse response = mvc
+				.perform(get("/cartoes/" + NUMERO_CARTAO).accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
 		assertThat(response.getContentAsString()).isEqualTo("");
 	}
