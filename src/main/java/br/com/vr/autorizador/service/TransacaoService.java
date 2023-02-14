@@ -23,7 +23,6 @@ public class TransacaoService {
 	private CartaoService cartaoService;
 
 	public TransacaoRequest realizarTransacao(TransacaoRequest transacaoRequest) {
-
 		Cartao cartao = cartaoService.findByNumeroCartao(transacaoRequest.getNumeroCartao());
         validarTransacao(cartao, transacaoRequest);
 		Transacao transacao = Transacao.builder().valor(transacaoRequest.getValor()).cartao(cartao).build();
