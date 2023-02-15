@@ -2,6 +2,8 @@ package br.com.vr.autorizador.controller;
 
 import java.math.BigDecimal;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class CartaoController {
 	private CartaoService cartaoService;
 
 	@PostMapping
-	public ResponseEntity<CartaoRequest> cadastrar(@RequestBody CartaoRequest cartaoRequest) {
+	public ResponseEntity<CartaoRequest> cadastrar(@RequestBody @Valid CartaoRequest cartaoRequest) {
 		cartaoService.cadastrar(cartaoRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(cartaoRequest);
 	}

@@ -1,5 +1,7 @@
 package br.com.vr.autorizador.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ public class TransacaoController {
 	private TransacaoService transacaoService;
 
 	@PostMapping
-	public ResponseEntity<?> realizarTransacao(@RequestBody TransacaoRequest transacaoRequest) {
+	public ResponseEntity<?> realizarTransacao(@RequestBody @Valid TransacaoRequest transacaoRequest) {
 		transacaoService.realizarTransacao(transacaoRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body("OK");
 	}
