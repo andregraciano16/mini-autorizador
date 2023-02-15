@@ -14,12 +14,12 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class CartaoRequest {
 
-	@NotEmpty(message = "Número do cartão é obrigatório")
-	@Size(max = 16, message = "Numero do cartão deve conter no máximo 16 digitos")
+	@NotEmpty(message = "{mensagem.validacao.numero.cartao.obrigatorio}")
+	@Size(max = 16, message = "{mensagem.validacao.numero.cartao.tamanho}")
 	private String numeroCartao;
 	
-	@NotEmpty(message = "Senha é obrigatória")
-	@Size(min = 6, max = 6, message = "Senha deve conter 6 números")
+	@NotEmpty(message = "{mensagem.validacao.senha.cartao.obrigatorio}")
+	@Size(min = 6, max = 6, message = "{mensagem.validacao.senha.cartao.tamanho}")
 	private String senha;
 
 }
